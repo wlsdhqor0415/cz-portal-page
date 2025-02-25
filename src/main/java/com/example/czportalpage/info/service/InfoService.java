@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static com.example.czportalpage.info.service.jsonParse.jsonFetcher.fetchJson;
 
@@ -66,11 +67,11 @@ public class InfoService {
 
             try {
                 List<LevelData> levels = objectMapper.readValue(levelData, new TypeReference<List<LevelData>>() {});
-                String solvedCountByLevelArray = new String();
+                StringBuilder solvedCountByLevelArray = new StringBuilder();
                 for (LevelData level : levels) {
-                    solvedCountByLevelArray += level.getSolved() + ",";
+                    solvedCountByLevelArray.append(level.getSolved()).append(",");
                 }
-                newInfo.setInitSolvedCountByLevelArray(solvedCountByLevelArray);
+                newInfo.setInitSolvedCountByLevelArray(solvedCountByLevelArray.toString());
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -111,18 +112,17 @@ public class InfoService {
 
                 try {
                     List<LevelData> levels = objectMapper.readValue(levelData, new TypeReference<List<LevelData>>() {});
-                    String solvedCountByLevelArray = new String();
+                    StringBuilder solvedCountByLevelArray = new StringBuilder();
                     for (LevelData level : levels) {
-                        solvedCountByLevelArray += level.getSolved() + ",";
+                        solvedCountByLevelArray.append(level.getSolved()).append(",");
                     }
-                    info.setCurrentSolvedCountByLevelArray(solvedCountByLevelArray);
+                    info.setCurrentSolvedCountByLevelArray(solvedCountByLevelArray.toString());
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            infoRepository.save(info).getInfoId();
         }
     }
 
@@ -130,33 +130,13 @@ public class InfoService {
         Info info = infoRepository.findById(infoId)
                 .orElseThrow(() ->
                         new EntityNotFoundException("Info with ID " + infoId + " not found"));
+        return new InfoRequestDto(info);
+    }
 
-        InfoRequestDto infoRequestDto = new InfoRequestDto();
-        infoRequestDto.setUsername(info.getUsername());
-        infoRequestDto.setNickname(info.getNickname());
-        infoRequestDto.setRatingDiff(String.valueOf(
-                Integer.parseInt(info.getCurrentRating()) - Integer.parseInt(info.getInitRating()))
-        );
-        infoRequestDto.setSolvedCountDiff(String.valueOf(
-                Integer.parseInt(info.getCurrentSolvedCount()) - Integer.parseInt(info.getInitSolvedCount()))
-        );
-
-        ArrayList<Integer> currentSolvedCountByLevelArray = new ArrayList<Integer>();
-        String[] currentItems = info.getCurrentSolvedCountByLevelArray().split(",");
-        for (String item : currentItems) {
-            currentSolvedCountByLevelArray.add(Integer.parseInt(item));
-        }
-        ArrayList<Integer> initSolvedCountByLevelArray = new ArrayList<Integer>();
-        String[] initItems = info.getInitSolvedCountByLevelArray().split(",");
-        for (String item : initItems) {
-            initSolvedCountByLevelArray.add(Integer.parseInt(item));
-        }
-        String solvedCountByLevelArray = new String();
-        for (int i = 0; i < currentSolvedCountByLevelArray.size(); i++) {
-            solvedCountByLevelArray += String.valueOf(currentSolvedCountByLevelArray.get(i) - initSolvedCountByLevelArray.get(i)) + ",";
-        }
-        infoRequestDto.setSolvedCountDiff(solvedCountByLevelArray);
-
-        return infoRequestDto;
+    public List<InfoRequestDto> getAllInfos() {
+        // 데이터베이스에서 모든 Info 엔티티 가져오기
+        List<Info> infos = infoRepository.findAll();
+        // List<Info>를 List<InfoDto>로 변환
+        return infos.stream().map(InfoRequestDto::new).collect(Collectors.toList());
     }
 }
