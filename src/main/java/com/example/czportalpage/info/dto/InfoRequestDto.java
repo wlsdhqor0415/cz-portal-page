@@ -46,10 +46,10 @@ public class InfoRequestDto {
         for (String item : initItems) {
             initSolvedCountByLevelArray.add(Integer.parseInt(item));
         }
-        String solvedCountByLevelArray = new String();
+        StringBuilder solvedCountByLevelArray = new StringBuilder();
         for (int i = 0; i < currentSolvedCountByLevelArray.size(); i++) {
-            solvedCountByLevelArray += String.valueOf(currentSolvedCountByLevelArray.get(i) - initSolvedCountByLevelArray.get(i)) + ",";
+            solvedCountByLevelArray.append(currentSolvedCountByLevelArray.get(i) - initSolvedCountByLevelArray.get(i)).append(",");
         }
-        this.setSolvedCountDiff(solvedCountByLevelArray);
+        this.setSolvedCountDiffByLevelArray(solvedCountByLevelArray.toString());
     }
 }

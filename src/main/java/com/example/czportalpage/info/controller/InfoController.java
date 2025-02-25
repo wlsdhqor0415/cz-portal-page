@@ -37,5 +37,4 @@ public class InfoController {
         List<InfoRequestDto> infos = infoService.getAllInfos();
         return ResponseEntity.status(HttpStatus.OK).body(infos);
     }
-
 }

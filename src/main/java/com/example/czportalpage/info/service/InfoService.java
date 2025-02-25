@@ -10,6 +10,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -23,10 +24,12 @@ import static com.example.czportalpage.info.service.jsonParse.jsonFetcher.fetchJ
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class InfoService {
     private final InfoRepository infoRepository;
 
     public Long createInfo(InfoPostDto infoPostDto){
+        log.info("createInfo has been started!!");
         // 1. `username`이 null이거나 비어 있다면 예외 발생
         if (infoPostDto.getUsername() == null || infoPostDto.getUsername().trim().isEmpty()) {
             throw new IllegalArgumentException("Username cannot be null or empty");
@@ -85,8 +88,9 @@ public class InfoService {
         return infoRepository.save(savedInfo).getInfoId();
     }
 
-    @Scheduled(fixedRate = 600000)
+    @Scheduled(fixedRate = 60000)
     public void updateInfo(){
+        log.info("updateInfo has been started!!");
         for(Info info : infoRepository.findAll()) {
             try {
                 String urlString = "https://solved.ac/api/v3/search/user?query=" + info.getUsername();  // 사용하고자 하는 url로 변경
@@ -97,7 +101,7 @@ public class InfoService {
                     userInfoRoot userInfoRoot = objectMapper.readValue(userInfo, userInfoRoot.class);
                     info.setCurrentRating(String.valueOf(userInfoRoot.getItems().get(0).getRating()));
                     info.setCurrentSolvedCount(String.valueOf(userInfoRoot.getItems().get(0).getSolvedCount()));
-
+                    log.info("solvedCount: {}", userInfoRoot.getItems().get(0).getSolvedCount());
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -123,6 +127,7 @@ public class InfoService {
             } catch (Exception e) {
                 e.printStackTrace();
             }
+            infoRepository.save(info);
         }
     }
 
