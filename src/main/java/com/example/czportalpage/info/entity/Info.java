@@ -30,4 +30,6 @@ public class Info {
     private String initSolvedCountByLevelArray;
 
     private String currentSolvedCountByLevelArray;
+
+    private criteria criteria;
 }
