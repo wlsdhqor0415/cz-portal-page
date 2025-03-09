@@ -145,7 +145,7 @@ public class InfoService {
      * 매주 1, 2위 유저의 정보는 저장하고 유지
      * 이미 1, 2위 유저의 정보를 저장하는 테이블이 있을 때 중복해서 생성하는 것을 방지하는 코드는 구현되어 있지 않음
      */
-    @Scheduled(cron = "0 0 9 * * MON", zone = "Asia/Seoul")
+    @Scheduled(cron = "0 0 0 * * MON", zone = "Asia/Seoul")
     public void resetInfoWeekly(String criteria){
         log.info("resetInfoWeekly has been started!!");
 

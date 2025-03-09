@@ -26,9 +26,6 @@ public class InfoController {
         Long infoId = infoService.createInfo(infoPostDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(infoId);
     }
-    /**
-     * 아직 일주일 단위로 업데이트하는 기능이 들어가지 않았음, InfoService에 있는 resetInfoWeekly() 구현 후 넣어야 함
-     */
     @PatchMapping("/{infoId}")
     public ResponseEntity patchInfo(@PathVariable("infoId")Long infoId) {
         infoService.updateInfo();
